@@ -12,13 +12,13 @@ Model name is converted to lowercase for the collection name:
 """
 
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import Optional, Literal
 
-# Example schemas (replace with your own):
+# Example schemas (kept for reference)
 
 class User(BaseModel):
     """
-    Users collection schema
+    Example Users collection schema
     Collection name: "user" (lowercase of class name)
     """
     name: str = Field(..., description="Full name")
@@ -29,7 +29,7 @@ class User(BaseModel):
 
 class Product(BaseModel):
     """
-    Products collection schema
+    Example Products collection schema
     Collection name: "product" (lowercase of class name)
     """
     title: str = Field(..., description="Product title")
@@ -38,11 +38,55 @@ class Product(BaseModel):
     category: str = Field(..., description="Product category")
     in_stock: bool = Field(True, description="Whether product is in stock")
 
-# Add your own schemas here:
+# SMCC Classroom Evaluation Schemas
 # --------------------------------------------------
 
+SMCCRole = Literal[
+    "dean",
+    "chairperson",
+    "subject coordinator",
+    "principal",
+    "president",
+    "vice president",
+    "teacher",
+]
+
+class SmccUser(BaseModel):
+    """
+    SMCC users participating in classroom evaluations
+    Collection: "smccuser"
+    """
+    name: str = Field(..., description="Full name")
+    role: SMCCRole
+    email: Optional[str] = Field(None, description="Email address")
+    department: Optional[str] = Field(None, description="Department/Program")
+
+class Evaluation(BaseModel):
+    """
+    Evaluation records for teachers
+    Collection: "evaluation"
+    """
+    evaluator_name: str
+    evaluator_role: SMCCRole
+    teacher_name: str
+    course: str
+    section: Optional[str] = None
+    term: Optional[str] = None
+
+    # Core criteria scored 1-5
+    teaching_effectiveness: int = Field(..., ge=1, le=5)
+    classroom_management: int = Field(..., ge=1, le=5)
+    content_knowledge: int = Field(..., ge=1, le=5)
+    professionalism: int = Field(..., ge=1, le=5)
+
+    comments: Optional[str] = None
+
+class EvaluationResponse(BaseModel):
+    id: str
+    overall_score: float
+
 # Note: The Flames database viewer will automatically:
-# 1. Read these schemas from GET /schema endpoint
+# 1. Read these schemas from GET /schema endpoint (if provided)
 # 2. Use them for document validation when creating/editing
 # 3. Handle all database operations (CRUD) directly
 # 4. You don't need to create any database endpoints!
